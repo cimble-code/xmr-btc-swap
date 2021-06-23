@@ -27,6 +27,7 @@ pub struct Defaults {
     listen_address_ws: Multiaddr,
     electrum_rpc_url: Url,
     monero_wallet_rpc_url: Url,
+    kraken_ws_url: Url,
     bitcoin_confirmation_target: usize,
 }
 
@@ -41,6 +42,7 @@ impl GetDefaults for Testnet {
             listen_address_ws: Multiaddr::from_str("/ip4/0.0.0.0/tcp/9940/ws")?,
             electrum_rpc_url: Url::parse("ssl://electrum.blockstream.info:60002")?,
             monero_wallet_rpc_url: Url::parse("http://127.0.0.1:38083/json_rpc")?,
+            kraken_ws_url: Url::parse("wss://ws.kraken.com")?,
             bitcoin_confirmation_target: 1,
         };
 
@@ -59,6 +61,7 @@ impl GetDefaults for Mainnet {
             listen_address_ws: Multiaddr::from_str("/ip4/0.0.0.0/tcp/9940/ws")?,
             electrum_rpc_url: Url::parse("ssl://electrum.blockstream.info:50002")?,
             monero_wallet_rpc_url: Url::parse("http://127.0.0.1:18083/json_rpc")?,
+            kraken_ws_url: Url::parse("wss://ws.kraken.com")?,
             bitcoin_confirmation_target: 3,
         };
 
@@ -151,6 +154,7 @@ pub struct Maker {
     #[serde(with = "::bitcoin::util::amount::serde::as_btc")]
     pub max_buy_btc: bitcoin::Amount,
     pub ask_spread: Decimal,
+    pub kraken_ws_url: Url
 }
 
 impl Default for TorConf {
@@ -250,6 +254,11 @@ pub fn query_user_for_initial_config(testnet: bool) -> Result<Config> {
         .default(defaults.monero_wallet_rpc_url)
         .interact_text()?;
 
+    let kraken_url = Input::with_theme(&ColorfulTheme::default())
+        .with_prompt("Enter Kraken Price Ticker WebSocket URL or hit enter to use default")
+        .default(defaults.kraken_ws_url)
+        .interact_text()?;
+
     let tor_control_port = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("Enter Tor control port or hit enter to use default. If Tor is not running on your machine, no hidden service will be created.")
         .default(DEFAULT_CONTROL_PORT.to_owned())
@@ -307,6 +316,7 @@ pub fn query_user_for_initial_config(testnet: bool) -> Result<Config> {
             min_buy_btc: min_buy,
             max_buy_btc: max_buy,
             ask_spread,
+            kraken_ws_url: kraken_url
         },
     })
 }
@@ -347,6 +357,7 @@ mod tests {
                 min_buy_btc: bitcoin::Amount::from_btc(DEFAULT_MIN_BUY_AMOUNT).unwrap(),
                 max_buy_btc: bitcoin::Amount::from_btc(DEFAULT_MAX_BUY_AMOUNT).unwrap(),
                 ask_spread: Decimal::from_f64(DEFAULT_SPREAD).unwrap(),
+                kraken_ws_url: defaults.kraken_ws_url
             },
         };
 
@@ -387,6 +398,7 @@ mod tests {
                 min_buy_btc: bitcoin::Amount::from_btc(DEFAULT_MIN_BUY_AMOUNT).unwrap(),
                 max_buy_btc: bitcoin::Amount::from_btc(DEFAULT_MAX_BUY_AMOUNT).unwrap(),
                 ask_spread: Decimal::from_f64(DEFAULT_SPREAD).unwrap(),
+                kraken_ws_url: defaults.kraken_ws_url
             },
         };
 
