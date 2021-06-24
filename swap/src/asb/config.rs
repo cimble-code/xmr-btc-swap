@@ -254,11 +254,6 @@ pub fn query_user_for_initial_config(testnet: bool) -> Result<Config> {
         .default(defaults.monero_wallet_rpc_url)
         .interact_text()?;
 
-    let kraken_url = Input::with_theme(&ColorfulTheme::default())
-        .with_prompt("Enter Kraken Price Ticker WebSocket URL or hit enter to use default")
-        .default(defaults.kraken_ws_url)
-        .interact_text()?;
-
     let tor_control_port = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("Enter Tor control port or hit enter to use default. If Tor is not running on your machine, no hidden service will be created.")
         .default(DEFAULT_CONTROL_PORT.to_owned())
@@ -316,7 +311,7 @@ pub fn query_user_for_initial_config(testnet: bool) -> Result<Config> {
             min_buy_btc: min_buy,
             max_buy_btc: max_buy,
             ask_spread,
-            kraken_ws_url: kraken_url
+            kraken_ws_url: defaults.kraken_ws_url
         },
     })
 }
