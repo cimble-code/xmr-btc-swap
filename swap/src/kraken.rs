@@ -10,8 +10,9 @@ use url::Url;
 /// Connect to Kraken websocket API for a constant stream of rate updates.
 ///
 /// If the connection fails, it will automatically be re-established.
-/// 
-/// price_ticker_ws_url must point to a websocket server that follows the kraken price ticker protocol
+///
+/// price_ticker_ws_url must point to a websocket server that follows the kraken
+/// price ticker protocol
 /// See: https://docs.kraken.com/websockets/
 pub fn connect(price_ticker_ws_url: Url) -> Result<PriceUpdates> {
     let (price_update, price_update_receiver) = watch::channel(Err(Error::NotYetAvailable));
